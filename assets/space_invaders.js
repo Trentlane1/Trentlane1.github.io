@@ -26,6 +26,14 @@ let rows = 3;
 let cols = 8;
 let score = 0;
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.7;
+    player.x = canvas.width / 2 - playerWidth / 2;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
 function createEnemies() {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -40,36 +48,6 @@ function createEnemies() {
         }
     }
 }
-// For Tetris or Space Invaders
-
-document.getElementById("leftButton").addEventListener("touchstart", () => {
-    player.dx = -playerSpeed; // Move left when button is touched
-});
-
-document.getElementById("rightButton").addEventListener("touchstart", () => {
-    player.dx = playerSpeed; // Move right when button is touched
-});
-
-document.getElementById("leftButton").addEventListener("touchend", () => {
-    player.dx = 0; // Stop moving when touch is released
-});
-
-document.getElementById("rightButton").addEventListener("touchend", () => {
-    player.dx = 0; // Stop moving when touch is released
-});
-
-document.getElementById("fireButton").addEventListener("touchstart", () => {
-    if (game === "space_invaders") {
-        player.bullets.push({
-            x: player.x + player.width / 2 - bulletWidth / 2,
-            y: player.y,
-            width: bulletWidth,
-            height: bulletHeight
-        });
-    } else if (game === "tetris") {
-        playerRotate(); // Rotate the piece for Tetris
-    }
-});
 
 function drawPlayer() {
     ctx.fillStyle = "green";
@@ -185,7 +163,7 @@ function update() {
     requestAnimationFrame(update);
 }
 
-// Event Listeners
+// Event Listeners for keyboard
 document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
         player.dx = -playerSpeed;
@@ -205,6 +183,32 @@ document.addEventListener("keyup", (event) => {
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         player.dx = 0;
     }
+});
+
+// Touch control listeners
+document.getElementById("leftButton").addEventListener("touchstart", () => {
+    player.dx = -playerSpeed;
+});
+
+document.getElementById("rightButton").addEventListener("touchstart", () => {
+    player.dx = playerSpeed;
+});
+
+document.getElementById("fireButton").addEventListener("touchstart", () => {
+    player.bullets.push({
+        x: player.x + player.width / 2 - bulletWidth / 2,
+        y: player.y,
+        width: bulletWidth,
+        height: bulletHeight
+    });
+});
+
+document.getElementById("leftButton").addEventListener("touchend", () => {
+    player.dx = 0;
+});
+
+document.getElementById("rightButton").addEventListener("touchend", () => {
+    player.dx = 0;
 });
 
 // Initialize the game
