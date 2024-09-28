@@ -1,17 +1,9 @@
 const canvas = document.getElementById('tetrisCanvas');
-const context = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
 
-context.scale(20, 20);
+ctx.scale(20, 20);
 
-// Adjust canvas size for mobile responsiveness
-function resizeCanvas() {
-    canvas.width = window.innerWidth * 0.9;
-    canvas.height = window.innerHeight * 0.7;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-// Tetris logic
+// Create the arena (game board)
 function createMatrix(width, height) {
     const matrix = [];
     while (height--) {
@@ -20,35 +12,66 @@ function createMatrix(width, height) {
     return matrix;
 }
 
+// Create tetromino pieces
 function createPiece(type) {
     if (type === 'T') {
-        return [[0, 1, 0], [1, 1, 1], [0, 0, 0]];
+        return [
+            [0, 1, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+        ];
     } else if (type === 'O') {
-        return [[1, 1], [1, 1]];
+        return [
+            [1, 1],
+            [1, 1],
+        ];
     } else if (type === 'L') {
-        return [[0, 0, 1], [1, 1, 1], [0, 0, 0]];
+        return [
+            [0, 0, 1],
+            [1, 1, 1],
+            [0, 0, 0],
+        ];
     } else if (type === 'J') {
-        return [[1, 0, 0], [1, 1, 1], [0, 0, 0]];
+        return [
+            [1, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+        ];
     } else if (type === 'I') {
-        return [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0]];
+        return [
+            [0, 0, 0, 0],
+            [1, 1, 1, 1],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ];
     } else if (type === 'S') {
-        return [[0, 1, 1], [1, 1, 0], [0, 0, 0]];
+        return [
+            [0, 1, 1],
+            [1, 1, 0],
+            [0, 0, 0],
+        ];
     } else if (type === 'Z') {
-        return [[1, 1, 0], [0, 1, 1], [0, 0, 0]];
+        return [
+            [1, 1, 0],
+            [0, 1, 1],
+            [0, 0, 0],
+        ];
     }
 }
 
+// Draw the matrix (board or piece)
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value !== 0) {
-                context.fillStyle = 'red';
-                context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
             }
         });
     });
 }
 
+// Clear full rows
 function arenaSweep() {
     outer: for (let y = arena.length - 1; y > 0; --y) {
         for (let x = 0; x < arena[y].length; ++x) {
@@ -62,6 +85,7 @@ function arenaSweep() {
     }
 }
 
+// Drop the piece
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
@@ -74,6 +98,7 @@ function playerDrop() {
     dropCounter = 0;
 }
 
+// Player movement
 function playerMove(dir) {
     player.pos.x += dir;
     if (collide(arena, player)) {
@@ -81,10 +106,23 @@ function playerMove(dir) {
     }
 }
 
+// Rotate the piece
 function playerRotate() {
+    const pos = player.pos.x;
+    let offset = 1;
     rotate(player.matrix, 1);
+    while (collide(arena, player)) {
+        player.pos.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > player.matrix[0].length) {
+            rotate(player.matrix, -1);
+            player.pos.x = pos;
+            return;
+        }
+    }
 }
 
+// Merge the piece with the arena
 function merge(arena, player) {
     player.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -95,6 +133,7 @@ function merge(arena, player) {
     });
 }
 
+// Collision detection
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
     for (let y = 0; y < m.length; ++y) {
@@ -109,11 +148,13 @@ function collide(arena, player) {
     return false;
 }
 
+// Reset the player position
 function playerReset() {
     const pieces = 'ILJOTSZ';
     player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
     player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    player.pos.x = (arena[0].length / 2 | 0) -
+                   (player.matrix[0].length / 2 | 0);
     if (collide(arena, player)) {
         arena.forEach(row => row.fill(0));
         player.score = 0;
@@ -121,10 +162,17 @@ function playerReset() {
     }
 }
 
+// Rotate the matrix
 function rotate(matrix, dir) {
     for (let y = 0; y < matrix.length; ++y) {
         for (let x = 0; x < y; ++x) {
-            [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+            [
+                matrix[x][y],
+                matrix[y][x],
+            ] = [
+                matrix[y][x],
+                matrix[x][y],
+            ];
         }
     }
     if (dir > 0) {
@@ -134,10 +182,17 @@ function rotate(matrix, dir) {
     }
 }
 
+// Update the score display
 function updateScore() {
-    document.getElementById('score').innerText = player.score;
+    const scoreElement = document.getElementById('score');
+    if (scoreElement) {
+        scoreElement.innerText = player.score;
+    } else {
+        console.error("Score element not found in the DOM.");
+    }
 }
 
+// Update the game state
 let dropCounter = 0;
 let dropInterval = 1000;
 let lastTime = 0;
@@ -155,14 +210,16 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
+// Draw the game
 function draw() {
-    context.fillStyle = '#000';
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     drawMatrix(arena, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
 }
 
+// Set up the arena and player
 const arena = createMatrix(12, 20);
 const player = {
     pos: {x: 0, y: 0},
@@ -182,11 +239,11 @@ document.addEventListener('keydown', event => {
     }
 });
 
-// Touch control listeners
-document.getElementById('leftButton').addEventListener('touchstart', () => playerMove(-1));
-document.getElementById('rightButton').addEventListener('touchstart', () => playerMove(1));
-document.getElementById('rotateButton').addEventListener('touchstart', playerRotate);
-document.getElementById('dropButton').addEventListener('touchstart', playerDrop);
+// Mobile touch controls
+document.getElementById("leftButton").addEventListener("touchstart", () => playerMove(-1));
+document.getElementById("rightButton").addEventListener("touchstart", () => playerMove(1));
+document.getElementById("rotateButton").addEventListener("touchstart", () => playerRotate());
+document.getElementById("dropButton").addEventListener("touchstart", () => playerDrop());
 
 playerReset();
 updateScore();
