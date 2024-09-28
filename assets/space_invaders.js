@@ -26,14 +26,6 @@ let rows = 3;
 let cols = 8;
 let score = 0;
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth * 0.9;
-    canvas.height = window.innerHeight * 0.7;
-    player.x = canvas.width / 2 - playerWidth / 2;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
 function createEnemies() {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -89,25 +81,12 @@ function moveBullets() {
 }
 
 function moveEnemies() {
-    let shouldDrop = false;  // Changed to let to allow reassignment
+    let shouldDrop = false;
     enemies.forEach((enemy) => {
         if (enemy.alive) {
             enemy.x += enemySpeed;
             if (enemy.x + enemy.width >= canvas.width || enemy.x <= 0) {
-                shouldDrop = true;  // Reassignment is allowed here
-            }
-        }
-    });
-
-    if (shouldDrop) {
-        enemies.forEach((enemy) => {
-            enemy.y += enemyDropHeight;
-            enemy.x -= enemySpeed * 2;  // Moving them back for direction change
-        });
-        enemySpeed *= -1; // Reverse direction when edge is hit
-    }
-}
-
+                shouldDrop = true;
             }
         }
     });
@@ -117,7 +96,7 @@ function moveEnemies() {
             enemy.y += enemyDropHeight;
             enemy.x -= enemySpeed * 2;
         });
-        enemySpeed *= -1; // Change direction
+        enemySpeed *= -1; // Reverse direction when edge is hit
     }
 }
 
@@ -134,6 +113,7 @@ function checkCollisions() {
                 enemy.alive = false;
                 player.bullets.splice(bulletIndex, 1);
                 score += 10;
+                updateScore();
             }
         });
     });
@@ -143,6 +123,15 @@ function drawScore() {
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
     ctx.fillText("Score: " + score, 10, 20);
+}
+
+function updateScore() {
+    const scoreElement = document.getElementById('score');
+    if (scoreElement) {
+        scoreElement.innerText = score;
+    } else {
+        console.error("Score element not found in the DOM.");
+    }
 }
 
 function gameOver() {
@@ -176,7 +165,7 @@ function update() {
     requestAnimationFrame(update);
 }
 
-// Event Listeners for keyboard
+// Event Listeners for keyboard controls
 document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
         player.dx = -playerSpeed;
@@ -198,15 +187,11 @@ document.addEventListener("keyup", (event) => {
     }
 });
 
-// Touch control listeners
-document.getElementById("leftButton").addEventListener("touchstart", () => {
-    player.dx = -playerSpeed;
-});
-
-document.getElementById("rightButton").addEventListener("touchstart", () => {
-    player.dx = playerSpeed;
-});
-
+// Mobile touch controls
+document.getElementById("leftButton").addEventListener("touchstart", () => player.dx = -playerSpeed);
+document.getElementById("rightButton").addEventListener("touchstart", () => player.dx = playerSpeed);
+document.getElementById("leftButton").addEventListener("touchend", () => player.dx = 0);
+document.getElementById("rightButton").addEventListener("touchend", () => player.dx = 0);
 document.getElementById("fireButton").addEventListener("touchstart", () => {
     player.bullets.push({
         x: player.x + player.width / 2 - bulletWidth / 2,
@@ -214,14 +199,6 @@ document.getElementById("fireButton").addEventListener("touchstart", () => {
         width: bulletWidth,
         height: bulletHeight
     });
-});
-
-document.getElementById("leftButton").addEventListener("touchend", () => {
-    player.dx = 0;
-});
-
-document.getElementById("rightButton").addEventListener("touchend", () => {
-    player.dx = 0;
 });
 
 // Initialize the game
