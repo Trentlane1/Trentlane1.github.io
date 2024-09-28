@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invaders Game by Trentlane1</title>
+    <title>Play Space Invaders</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <header>
         <h1>Play Space Invaders</h1>
+        <div id="scoreDisplay">
+            Score: <span id="score">0</span>
+        </div>
     </header>
-    
-    <canvas id="spaceInvadersCanvas"></canvas>
-
-    <!-- Touch Controls for Mobile -->
+    <section>
+        <canvas id="spaceInvadersCanvas" width="600" height="400"></canvas>
+        <script src="assets/space_invaders.js"></script>
+    </section>
     <div id="controls">
         <button id="leftButton">Left</button>
         <button id="rightButton">Right</button>
         <button id="fireButton">Fire</button>
     </div>
-
-    <script src="assets/space_invaders.js"></script>
 </body>
 </html>
