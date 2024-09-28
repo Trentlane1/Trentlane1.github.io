@@ -40,6 +40,36 @@ function createEnemies() {
         }
     }
 }
+// For Tetris or Space Invaders
+
+document.getElementById("leftButton").addEventListener("touchstart", () => {
+    player.dx = -playerSpeed; // Move left when button is touched
+});
+
+document.getElementById("rightButton").addEventListener("touchstart", () => {
+    player.dx = playerSpeed; // Move right when button is touched
+});
+
+document.getElementById("leftButton").addEventListener("touchend", () => {
+    player.dx = 0; // Stop moving when touch is released
+});
+
+document.getElementById("rightButton").addEventListener("touchend", () => {
+    player.dx = 0; // Stop moving when touch is released
+});
+
+document.getElementById("fireButton").addEventListener("touchstart", () => {
+    if (game === "space_invaders") {
+        player.bullets.push({
+            x: player.x + player.width / 2 - bulletWidth / 2,
+            y: player.y,
+            width: bulletWidth,
+            height: bulletHeight
+        });
+    } else if (game === "tetris") {
+        playerRotate(); // Rotate the piece for Tetris
+    }
+});
 
 function drawPlayer() {
     ctx.fillStyle = "green";
