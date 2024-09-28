@@ -89,12 +89,25 @@ function moveBullets() {
 }
 
 function moveEnemies() {
-    let shouldDrop = false;
+    let shouldDrop = false;  // Changed to let to allow reassignment
     enemies.forEach((enemy) => {
         if (enemy.alive) {
             enemy.x += enemySpeed;
             if (enemy.x + enemy.width >= canvas.width || enemy.x <= 0) {
-                shouldDrop = true;
+                shouldDrop = true;  // Reassignment is allowed here
+            }
+        }
+    });
+
+    if (shouldDrop) {
+        enemies.forEach((enemy) => {
+            enemy.y += enemyDropHeight;
+            enemy.x -= enemySpeed * 2;  // Moving them back for direction change
+        });
+        enemySpeed *= -1; // Reverse direction when edge is hit
+    }
+}
+
             }
         }
     });
