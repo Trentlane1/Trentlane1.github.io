@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Invaders Game by Trentlane1</title>
+    <title>Tetris Game</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <header>
-        <h1>Play Space Invaders</h1>
+        <h1>Tetris</h1>
     </header>
-    <section>
-        <canvas id="spaceInvadersCanvas" width="600" height="400"></canvas>
-        <script src="assets/space_invaders.js"></script>
-    </section>
-    <footer>
-        <p>&copy; 2024 Trentlane1. All rights reserved.</p>
-    </footer>
+
+    <canvas id="tetrisCanvas"></canvas>
+
+    <div id="controls">
+        <button id="leftButton">Left</button>
+        <button id="rightButton">Right</button>
+        <button id="fireButton">Rotate</button>
+    </div>
+
+    <script src="assets/tetris.js"></script>
 </body>
 </html>
